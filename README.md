@@ -95,7 +95,7 @@ Perform an authentication with your MyTesla credentials using the web oAuth2 flo
 ```swift
 let api = TeslaSwift()
 let (webloginViewController, result) = await api.authenticate()
-guard let safeWebLoginViewController = authViewControler else { return }
+guard let safeWebLoginViewController = webloginViewController else { return }
 present(safeWebLoginViewController, animated: true, completion: nil)
 Task { @MainActor in
         do {
