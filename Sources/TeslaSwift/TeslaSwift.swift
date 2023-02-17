@@ -545,7 +545,7 @@ extension TeslaSwift {
                     } else {
                         continuation.resume(with: .failure(error ?? TeslaError.internalError))
                     }
-                }
+                }.resume()
             }
         }
 
