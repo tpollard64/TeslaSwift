@@ -107,6 +107,55 @@ Task { @MainActor in
 }
 ```
 
+To to perform an authentication in SwiftUI, create an UIViewControllerRepresentable to inject the UIViewController into a SwiftUI view:
+
+```swift
+import TeslaSwift
+import SwiftUI
+
+struct TeslaWebLogin: UIViewControllerRepresentable {
+    let api = TeslaSwift()    
+    
+    func makeUIViewController(context: Context) -> TeslaWebLoginViewController {
+        let (webloginViewController, result) = api.authenticateWeb()        
+        Task { @MainActor in
+                do {
+                     _ = try await result()
+                    print("Authentication success")                    
+                    guard api.isAuthenticated else { return }
+                    Task { @MainActor in
+                        do {
+                            let vehicles = try await api.getVehicles()
+
+                            // post process your vehicles here
+
+                        } catch {
+                            print("Error",error)
+                        }
+                    }                    
+                } catch let error {
+                    print("Error", error)
+               }
+        }        
+        return webloginViewController!
+    }
+    
+    func updateUIViewController(_ uiViewController: TeslaWebLoginViewController, context: Context) {
+    }
+    
+}
+```
+
+```swift
+import SwiftUI
+struct TeslaLogin: View {
+    var body: some View {
+        VStack {
+            TeslaWebLogin()
+        }
+    }
+}
+```
 
 ## Token reuse
 After authentication, store the AuthToken in a safe place.
