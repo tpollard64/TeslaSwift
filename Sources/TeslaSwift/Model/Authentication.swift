@@ -9,7 +9,7 @@
 import Foundation
 import CryptoKit
 
-private let oAuthClientID: String = "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef2106796384"
+private let oAuthClientID: String = "81527cff06843c8634fdc09e8ac0abefb46ac849f38fe1e431c2ef21067963841234334232123232323232"
 private let oAuthWebClientID: String = "ownerapi"
 private let oAuthClientSecret: String = "c7257eb71a564034f9419ee651c7d0e5f7aa6bfbd18bafb5c5c033b093bb2fa3"
 private let oAuthScope: String = "openid email offline_access"
@@ -58,43 +58,6 @@ open class AuthToken: Codable {
 	}
 }
 
-class AuthTokenRequest: Encodable {
-	
-    enum GrantType: String, Encodable {
-        case password
-        case refreshToken = "refresh_token"
-    }
-    
-    var grantType: GrantType
-	var clientID: String = oAuthClientID
-	var clientSecret: String = oAuthClientSecret
-    
-	var email: String?
-	var password: String?
-
-    var refreshToken: String?
-
-    init(email: String? = nil, password: String? = nil, grantType: GrantType = .password, refreshToken: String? = nil) {
-		self.email = email
-		self.password = password
-		self.grantType = grantType
-        self.refreshToken = refreshToken
-	}
-	
-	// MARK: Codable protocol
-	
-	enum CodingKeys: String, CodingKey {
-		typealias RawValue = String
-		
-		case grantType = "grant_type"
-		case clientID = "client_id"
-		case clientSecret = "client_secret"
-		case email = "email"
-		case password = "password"
-        case refreshToken = "refresh_token"
-	}
-}
-
 class AuthTokenRequestWeb: Encodable {
 
     enum GrantType: String, Encodable {
@@ -115,9 +78,9 @@ class AuthTokenRequestWeb: Encodable {
 
     init(grantType: GrantType = .authorizationCode, code: String? = nil, refreshToken: String? = nil) {
         if grantType == .authorizationCode {
-            codeVerifier = oAuthClientID.codeVerifier
+            self.codeVerifier = oAuthClientID
             self.code = code
-            redirectURI = oAuthRedirectURI
+            self.redirectURI = oAuthRedirectURI
         } else if grantType == .refreshToken {
             self.refreshToken = refreshToken
             self.scope = oAuthScope
@@ -153,7 +116,7 @@ class AuthCodeRequest: Encodable {
     var state = "teslaSwift"
 
     init() {
-        self.codeChallenge = clientID.codeVerifier.challenge
+        self.codeChallenge = oAuthClientID.challenge
     }
 
     // MARK: Codable protocol
@@ -183,15 +146,6 @@ class AuthCodeRequest: Encodable {
 }
 
 extension String {
-    var codeVerifier: String {
-        let verifier = self.data(using: .utf8)!.base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-            .trimmingCharacters(in: .whitespaces)
-        return verifier
-    }
-
     var challenge: String {
         let hash = self.sha256
         let challenge = hash.base64EncodedString()
@@ -202,15 +156,9 @@ extension String {
         return challenge
     }
 
-    var sha256: String {
+    private var sha256: Data {
         let inputData = Data(self.utf8)
         let hashed = SHA256.hash(data: inputData)
-        let hashString = hashed.compactMap { String(format: "%02x", $0) }.joined()
-        return hashString
-    }
-
-    func base64EncodedString() -> String {
-        let inputData = Data(self.utf8)
-        return inputData.base64EncodedString()
+        return Data(hashed)
     }
 }
