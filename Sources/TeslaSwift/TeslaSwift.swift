@@ -96,7 +96,9 @@ extension TeslaSwift {
         } catch let error {
             if case let TeslaError.networkError(error: internalError) = error {
                 if internalError.code == 302 || internalError.code == 403 {
-                    return try await self.request(.oAuth2TokenCN, body: body)
+                    let token: AuthToken = try await request(.oAuth2TokenCN, body: body)
+                    self.token = token
+                    return token
                 } else if internalError.code == 401 {
                     throw TeslaError.authenticationFailed
                 } else {
@@ -125,7 +127,9 @@ extension TeslaSwift {
             if case let TeslaError.networkError(error: internalError) = error {
                 if internalError.code == 302 || internalError.code == 403 {
                     //Handle redirection for tesla.cn
-                    return try await self.request(.oAuth2TokenCN, body: body)
+                    let authToken: AuthToken = try await request(.oAuth2TokenCN, body: body)
+                    self.token = authToken
+                    return authToken
                 } else if internalError.code == 401 {
                     throw TeslaError.tokenRefreshFailed
                 } else {
