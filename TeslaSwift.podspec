@@ -33,12 +33,6 @@ Pod::Spec.new do |s|
         ss.dependency 'Starscream' ,  '~> 4'
     end
 
-    s.subspec 'PromiseKit' do |ss|
-        ss.source_files = 'Sources/Extensions/PromiseKit/*.swift'
-        ss.dependency 'PromiseKit/CorePromise' ,  '~> 6'
-        ss.dependency 'TeslaSwift/Core'
-    end
-
     s.subspec 'Combine' do |ss|
         ss.source_files = 'Sources/Extensions/Combine/*.swift'
         ss.dependency 'TeslaSwift/Core'
