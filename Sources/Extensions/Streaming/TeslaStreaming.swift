@@ -24,7 +24,6 @@ enum TeslaStreamAuthenticationType {
 }
 
 struct TeslaStreamAuthentication {
-
     let type: TeslaStreamAuthenticationType
     let vehicleId: String
     
@@ -43,9 +42,12 @@ public class TeslaStreaming {
         teslaSwift.debuggingEnabled
     }
     private var httpStreaming: WebSocket
+    private var webSocketTask: URLSessionWebSocketTask
     private var teslaSwift: TeslaSwift
     
     public init(teslaSwift: TeslaSwift) {
+        webSocketTask = URLSession(configuration: .default).webSocketTask(with: URL(string: "wss://streaming.vn.teslamotors.com/streaming/")!)
+
         httpStreaming = WebSocket(request: URLRequest(url: URL(string: "wss://streaming.vn.teslamotors.com/streaming/")!))
         self.teslaSwift = teslaSwift
     }
@@ -91,6 +93,7 @@ public class TeslaStreaming {
      */
     public func closeStream() {
         httpStreaming.disconnect()
+        webSocketTask.cancel()
         logDebug("Stream closed", debuggingEnabled: self.debuggingEnabled)
     }
 
@@ -117,6 +120,17 @@ public class TeslaStreaming {
         let url = httpStreaming.request.url?.absoluteString
         
         logDebug("Opening Stream to: \(url ?? "")", debuggingEnabled: debuggingEnabled)
+
+
+        webSocketTask.receive { result in
+            switch result {
+                case let .success(message):
+                    print(message)
+                case let .failure(error):
+                    //logDebug("Stream disconnected \(code):\(error)", debuggingEnabled: self.debuggingEnabled)
+                    dataReceived(TeslaStreamingEvent.error(NSError(domain: "TeslaStreamingError", code: Int(404), userInfo: ["error": error])))
+            }
+        }
 
         httpStreaming.onEvent = {
             [weak self] event in

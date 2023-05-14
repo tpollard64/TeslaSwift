@@ -143,6 +143,8 @@ open class VehicleState: Codable {
 	open var valetPinNeeded: Bool?
 	
 	open var vehicleName: String?
+
+    //TOOD: webcam_available: Bool
 	
 	// MARK: Codable protocol
 	
@@ -269,7 +271,6 @@ open class VehicleState: Codable {
 	}
 	
 	public func encode(to encoder: Encoder) throws {
-		
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		
 		try container.encodeIfPresent(apiVersion, forKey: .apiVersion)
@@ -308,8 +309,6 @@ open class VehicleState: Codable {
 		try container.encodeIfPresent(timeStamp, forKey: .timeStamp)
 		try container.encodeIfPresent(valetMode, forKey: .valetMode)
 		try container.encodeIfPresent(valetPinNeeded, forKey: .valetPinNeeded)
-		
 		try container.encodeIfPresent(vehicleName, forKey: .vehicleName)
-		
 	}
 }

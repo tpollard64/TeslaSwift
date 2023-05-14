@@ -21,57 +21,6 @@ class VehicleViewController: UIViewController {
             self.textView.text = "Inside temp: \(vehicle2.jsonString!)"
         }
     }
-    
-    @IBAction func getTemps(_ sender: Any) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let climateState = try await api.getVehicleClimateState(vehicle)
-            self.textView.text = "Inside temp: \(String(describing: climateState.insideTemperature?.celsius))\n" +
-            climateState.jsonString!
-        }
-	}
-
-	@IBAction func getChargeState(_ sender: AnyObject) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let chargeState = try await api.getVehicleChargeState(vehicle)
-            self.textView.text = "Battery: \(chargeState.batteryLevel!) % (\(chargeState.idealBatteryRange!.kms) km)\n" +
-            "charge rate: \(chargeState.chargeRate!.kilometersPerHour) km/h\n" +
-            "energy added: \(chargeState.chargeEnergyAdded!) kWh\n" +
-            "distance added (ideal): \(chargeState.chargeDistanceAddedIdeal!.kms) km\n" +
-            "power: \(chargeState.chargerPower ?? 0) kW\n" +
-            "\(chargeState.chargerVoltage ?? 0)V \(chargeState.chargerActualCurrent ?? 0)A\n" +
-            "charger max current: \(String(describing: chargeState.chargerPilotCurrent))\n\(chargeState.jsonString!)"
-
-        }
-	}
-
-	@IBAction func getVehicleState(_ sender: Any) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let vehicleState = try await api.getVehicleState(vehicle)
-            self.textView.text = "FW: \(String(describing: vehicleState.firmwareVersion))\n" +
-            vehicleState.jsonString!
-        }
-	}
-
-	@IBAction func getDriveState(_ sender: Any) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let driveState = try await api.getVehicleDriveState(vehicle)
-            self.textView.text = "Location: \(String(describing: driveState.position))\n" +
-            driveState.jsonString!
-        }
-	}
-
-	@IBAction func getGUISettings(_ sender: Any) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let guiSettings = try await api.getVehicleGuiSettings(vehicle)
-            self.textView.text = "Charge rate units: \(String(describing: guiSettings.chargeRateUnits))\n" +
-            guiSettings.jsonString!
-        }
-	}
 	
 	@IBAction func gettAll(_ sender: Any) {
         guard let vehicle = vehicle else { return }
@@ -79,16 +28,6 @@ class VehicleViewController: UIViewController {
             let extendedVehicle = try await api.getAllData(vehicle)
             self.textView.text = "All data:\n" +
             extendedVehicle.jsonString!
-        }
-	}
-	
-	
-	@IBAction func getConfig(_ sender: Any) {
-        guard let vehicle = vehicle else { return }
-        Task { @MainActor in
-            let config = try await api.getVehicleConfig(vehicle)
-            self.textView.text = "All data:\n" +
-            config.jsonString!
         }
 	}
 	
