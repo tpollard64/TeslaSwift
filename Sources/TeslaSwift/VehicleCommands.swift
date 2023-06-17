@@ -52,6 +52,8 @@ public enum VehicleCommand {
     case sentryMode(activated: Bool)
     case windowControl(state: WindowState)
     case setCharging(amps: Int)
+    case fart
+    case remote_boombox(acton: Int)
 
     func path() -> String {
         switch self {
@@ -139,6 +141,10 @@ public enum VehicleCommand {
                 return "command/window_control"
             case .setCharging:
                 return "command/set_charging_amps"
+            case .fart:
+                return "command/fart"
+            case .remote_boombox:
+                return "command/remote_boombox"
         }
     }
 }
